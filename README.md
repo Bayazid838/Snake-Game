@@ -1,4 +1,4 @@
-Sure! Here is the complete README in a code snippet format for you to copy and paste:
+
 
 ```markdown
 # Snake Game
@@ -13,20 +13,8 @@ My first ever developed game using Python. I used the Tkinter module to create t
 
 ## Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/snake-game.git
-   ```
-
-2. Navigate to the project directory:
-   ```bash
-   cd snake-game
-   ```
-
-3. Install the required dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+You must install python 3 in your operating system in order to run this file. You can do that from their official website https://python.org
+I've used pygame library using cmd
 
 ## How to Play
 
@@ -41,8 +29,7 @@ My first ever developed game using Python. I used the Tkinter module to create t
 
 ## Screenshots
 
-![Screenshot 1](path/to/screenshot1.png)
-![Screenshot 2](path/to/screenshot2.png)
+No screenshots available at this moment.
 
 ## Contributing
 
@@ -55,10 +42,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgements
 
 - [Tkinter](https://docs.python.org/3/library/tkinter.html) for the UI framework
+- [Pygame](https://www.pygame.org/news) for 2D game mechanism support
 
 ---
 
-*Note: Customize the installation steps and paths according to your project structure.*
-```
 
-Just replace `yourusername` with your GitHub username and update the paths for the screenshots if needed.
