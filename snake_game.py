@@ -4,7 +4,7 @@ import pygame
 
 GAME_WIDTH = 800
 GAME_HEIGHT = 600
-SPEED = 120
+SPEED = 110
 SPACE_SIZE = 50
 BODY_PARTS = 3
 snake_colors = ["Red", "Blue", "Green", "White", "Yellow", "Purple", "Orange", "Cyan", "Pink", "#00FF00"]
@@ -37,39 +37,38 @@ class Food:
         canvas.create_oval(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=FOOD_COLOR, tag="food")
 
 def next_turn(snake, food):
-    if not pause:
-        x, y = snake.coordinates[0]
+    x, y = snake.coordinates[0]
 
-        if direction == "up":
-            y -= SPACE_SIZE
-        elif direction == "down":
-            y += SPACE_SIZE
-        elif direction == "left":
-            x -= SPACE_SIZE
-        elif direction == "right":
-            x += SPACE_SIZE
+    if direction == "up":
+        y -= SPACE_SIZE
+    elif direction == "down":
+        y += SPACE_SIZE
+    elif direction == "left":
+        x -= SPACE_SIZE
+    elif direction == "right":
+        x += SPACE_SIZE
 
-        snake.coordinates.insert(0, (x, y))
+    snake.coordinates.insert(0, (x, y))
 
-        square = canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=snake.color)
-        snake.squares.insert(0, square)
+    square = canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=snake.color)
+    snake.squares.insert(0, square)
 
-        if x == food.coordinates[0] and y == food.coordinates[1]:
-            global score
-            score += 1
-            label.config(text="Score:{}".format(score), fg="#00FF00")
-            canvas.delete("food")
-            food = Food(snake.coordinates)
-            pygame.mixer.Sound.play(eat_sound)
-        else:
-            del snake.coordinates[-1]
-            canvas.delete(snake.squares[-1])
-            del snake.squares[-1]
+    if x == food.coordinates[0] and y == food.coordinates[1]:
+        global score
+        score += 1
+        label.config(text="Score:{}".format(score), fg="#00FF00")
+        canvas.delete("food")
+        food = Food(snake.coordinates)
+        pygame.mixer.Sound.play(eat_sound)
+    else:
+        del snake.coordinates[-1]
+        canvas.delete(snake.squares[-1])
+        del snake.squares[-1]
 
-        if check_collisions(snake):
-            game_over()
-        else:
-            window.after(SPEED, next_turn, snake, food)
+    if check_collisions(snake):
+        game_over()
+    else:
+        window.after(SPEED, next_turn, snake, food)
 
 def change_direction(new_direction):
     global direction
@@ -128,21 +127,13 @@ def restart_game():
     score = 0
     direction = 'down'
     SNAKE_COLOR = random.choice(snake_colors)
-    pause = False
 
     label.config(text="Score:{}".format(score), fg="#00FF00")
-    
 
     snake = Snake(SNAKE_COLOR)
     food = Food(snake.coordinates)
 
     next_turn(snake, food)
-
-def pause_game(event):
-    global pause
-    pause = not pause
-    if not pause:
-        next_turn(snake, food)
 
 window = Tk()
 window.title("Snake game")
@@ -158,18 +149,11 @@ direction = 'down'
 highscore = 0
 restart_button = None
 SNAKE_COLOR = random.choice(snake_colors)
-pause = False
 
 label = Label(window, text="Score:{}".format(score), font=('consolas', 40))
 label.pack()
-#photo = PhotoImage(file='banner.png')
-#banner_label = Label(window,
-              #text=label,
-              #font=('Arial',40,'bold'),
-              #image=photo)
-#banner_label.pack()
-pygame.mixer.Sound.play(background_music)
 
+pygame.mixer.Sound.play(background_music, loops=-1)
 
 canvas = Canvas(window, bg=BACKGROUND_COLOR, height=GAME_HEIGHT, width=GAME_WIDTH)
 canvas.pack()
@@ -190,11 +174,10 @@ window.bind('<a>', lambda event: change_direction('left'))
 window.bind('<d>', lambda event: change_direction('right'))
 window.bind('<w>', lambda event: change_direction('up'))
 window.bind('<s>', lambda event: change_direction('down'))
-window.bind('<p>', pause_game)
 
 snake = Snake(SNAKE_COLOR)
 food = Food(snake.coordinates)
-print("If you have any feedback regarding this product you may cantact the developer (Bayazid) anytime you want. Contact:- notbayazid@gmail.com")
+print("If you have any feedback regarding this product you may contact the developer (Bayazid) anytime you want. Contact:- notbayazid@gmail.com")
 next_turn(snake, food)
 
 window.mainloop()
