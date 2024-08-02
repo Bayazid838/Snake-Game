@@ -1,9 +1,10 @@
 
 
+---
 
 # Snake Game
 
-My first ever developed game using Python. I used the Tkinter module to create the UI. I'm new to coding and look forward to making more awesome projects!
+My first ever developed game using Python. I used the Tkinter module to create the UI and the Pygame library for game mechanics. I'm new to coding and look forward to making more awesome projects!
 
 ## Features
 
@@ -13,8 +14,11 @@ My first ever developed game using Python. I used the Tkinter module to create t
 
 ## Installation
 
-You must install python 3 in your operating system in order to run this file. You can do that from their official website https://python.org
-I've used pygame library using cmd
+You must install Python 3 in your operating system to run this game. You can download it from the [official Python website](https://python.org). Additionally, you need to install the Pygame library. You can do this using the following command in your terminal or command prompt:
+
+```bash
+pip install pygame
+```
 
 ## How to Play
 
@@ -29,11 +33,11 @@ I've used pygame library using cmd
 
 ## Screenshots
 
-No screenshots available at this moment.
+No screenshots available at this moment. (Consider adding some images of your game in action to make it more engaging.)
 
 ## Contributing
 
-Feel free to fork this repository and submit pull requests. Any contributions are greatly appreciated!
+Feel free to fork this repository and submit pull requests. Any contributions are greatly appreciated! Whether it's fixing bugs, adding new features, or improving the code, your help is welcome.
 
 ## License
 
@@ -42,8 +46,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgements
 
 - [Tkinter](https://docs.python.org/3/library/tkinter.html) for the UI framework
-- [Pygame](https://www.pygame.org/news) for 2D game mechanism support
+- [Pygame](https://www.pygame.org/news) for 2D game mechanics support
+- Various online resources and tutorials that guided me through the development process
 
 ---
-
-
