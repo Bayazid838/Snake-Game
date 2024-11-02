@@ -2,182 +2,183 @@ from tkinter import *
 import random
 import pygame
 
-GAME_WIDTH = 800
-GAME_HEIGHT = 600
-SPEED = 110
-SPACE_SIZE = 50
-BODY_PARTS = 3
+# Configuration Constants
+GAME_WIDTH, GAME_HEIGHT = 900, 700
+SPEED, SPACE_SIZE, BODY_PARTS = 115, 50, 3
 snake_colors = ["Red", "Blue", "Green", "White", "Yellow", "Purple", "Orange", "Cyan", "Pink", "#00FF00"]
-FOOD_COLOR = "#FF0000"
-BACKGROUND_COLOR = "#000000"
+FOOD_COLOR, BACKGROUND_COLOR = "#FF0000", "#000000"
 
-class Snake:
-    def __init__(self, color):
-        self.body_size = BODY_PARTS
-        self.coordinates = []
-        self.squares = []
-        self.color = color
-
-        for i in range(0, BODY_PARTS):
-            self.coordinates.append([0, 0])
-
-        for x, y in self.coordinates:
-            square = canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=self.color, tag="snake")
-            self.squares.append(square)
-
-class Food:
-    def __init__(self, snake_coordinates):
-        while True:
-            x = int(random.randint(0, (GAME_WIDTH / SPACE_SIZE) - 1) * SPACE_SIZE)
-            y = int(random.randint(0, (GAME_HEIGHT / SPACE_SIZE) - 1) * SPACE_SIZE)
-            if [x, y] not in snake_coordinates:
-                break
-
-        self.coordinates = [x, y]
-        canvas.create_oval(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=FOOD_COLOR, tag="food")
-
-def next_turn(snake, food):
-    x, y = snake.coordinates[0]
-
-    if direction == "up":
-        y -= SPACE_SIZE
-    elif direction == "down":
-        y += SPACE_SIZE
-    elif direction == "left":
-        x -= SPACE_SIZE
-    elif direction == "right":
-        x += SPACE_SIZE
-
-    snake.coordinates.insert(0, (x, y))
-
-    square = canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=snake.color)
-    snake.squares.insert(0, square)
-
-    if x == food.coordinates[0] and y == food.coordinates[1]:
-        global score
-        score += 1
-        label.config(text="Score:{}".format(score), fg="#00FF00")
-        canvas.delete("food")
-        food = Food(snake.coordinates)
-        pygame.mixer.Sound.play(eat_sound)
-    else:
-        del snake.coordinates[-1]
-        canvas.delete(snake.squares[-1])
-        del snake.squares[-1]
-
-    if check_collisions(snake):
-        game_over()
-    else:
-        window.after(SPEED, next_turn, snake, food)
-
-def change_direction(new_direction):
-    global direction
-
-    if new_direction == 'left' and direction != 'right':
-        direction = new_direction
-    elif new_direction == 'right' and direction != 'left':
-        direction = new_direction
-    elif new_direction == 'up' and direction != 'down':
-        direction = new_direction
-    elif new_direction == 'down' and direction != 'up':
-        direction = new_direction
-
-def check_collisions(snake):
-    x, y = snake.coordinates[0]
-
-    if x < 0 or x >= GAME_WIDTH or y < 0 or y >= GAME_HEIGHT:
-        return True
-
-    for body_part in snake.coordinates[1:]:
-        if x == body_part[0] and y == body_part[1]:
-            return True
-
-    return False
-
-def game_over():
-    global restart_button, highscore
-
-    canvas.delete(ALL)
-    canvas.create_text(canvas.winfo_width()/2, canvas.winfo_height()/2 - 50,
-                      font=('consolas', 70), text="GAME OVER...", fill="red", tag="game_over")
-    canvas.create_text(canvas.winfo_width()/2, canvas.winfo_height()/2 + 100,
-                      font=('consolas', 10), text="Developed By Bayazid Bostami Sinha", fill="grey", tag="dev")
-    pygame.mixer.Sound.play(game_over_sound)
-    print("You scored " + str(score) + " pts!")
-
-    if score > highscore:
-        highscore = score
-
-    print("Highscore: ", highscore)
-    print()
-    print("GAME OVER")
-    print()
-
-    restart_button = Button(window, text="RESTART GAME", command=restart_game, font=("Arial", 18), fg="#00FF00", bg="#e2fE34", activeforeground="#00FF00",
-                            activebackground="black")
-    restart_button.place(relx=0.5, rely=0.6, anchor=CENTER)
-
-def restart_game():
-    global snake, food, score, direction, restart_button, SNAKE_COLOR
-
-    restart_button.destroy()
-
-    canvas.delete(ALL)
-
-    score = 0
-    direction = 'down'
-    SNAKE_COLOR = random.choice(snake_colors)
-
-    label.config(text="Score:{}".format(score), fg="#00FF00")
-
-    snake = Snake(SNAKE_COLOR)
-    food = Food(snake.coordinates)
-
-    next_turn(snake, food)
-
-window = Tk()
-window.title("Snake game")
-window.resizable(False, False)
-
+# Sound initialization
 pygame.mixer.init()
 eat_sound = pygame.mixer.Sound("food_eating_sound.mp3")
 game_over_sound = pygame.mixer.Sound("game_over.mp3")
 background_music = pygame.mixer.Sound("breakfast.mp3")
 
-score = 0
-direction = 'down'
-highscore = 0
-restart_button = None
-SNAKE_COLOR = random.choice(snake_colors)
+class Snake:
+    def __init__(self, color):
+        self.color = color
+        self.body_size = BODY_PARTS
+        self.coordinates = [[0, 0] for _ in range(BODY_PARTS)]
+        self.squares = [canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=color, tag="snake")
+                        for x, y in self.coordinates]
 
-label = Label(window, text="Score:{}".format(score), font=('consolas', 40))
-label.pack()
+    def move(self, x, y):
+        self.coordinates.insert(0, [x, y])
+        square = canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=self.color)
+        self.squares.insert(0, square)
 
-pygame.mixer.Sound.play(background_music, loops=-1)
+    def shrink(self):
+        del self.coordinates[-1]
+        canvas.delete(self.squares[-1])
+        del self.squares[-1]
 
-canvas = Canvas(window, bg=BACKGROUND_COLOR, height=GAME_HEIGHT, width=GAME_WIDTH)
-canvas.pack()
+class Food:
+    def __init__(self, snake_coordinates):
+        self.coordinates = self.randomize_position(snake_coordinates)
+        canvas.create_oval(self.coordinates[0], self.coordinates[1],
+                           self.coordinates[0] + SPACE_SIZE, self.coordinates[1] + SPACE_SIZE, 
+                           fill=FOOD_COLOR, tag="food")
 
-window.update()
+    @staticmethod
+    def randomize_position(snake_coordinates):
+        while True:
+            x = random.randint(0, (GAME_WIDTH // SPACE_SIZE) - 1) * SPACE_SIZE
+            y = random.randint(0, (GAME_HEIGHT // SPACE_SIZE) - 1) * SPACE_SIZE
+            if [x, y] not in snake_coordinates:
+                return [x, y]
 
-window_width = window.winfo_width()
-window_height = window.winfo_height()
-screen_width = window.winfo_screenwidth()
-screen_height = window.winfo_screenheight()
+class Game:
+    def __init__(self):
+        self.window = Tk()
+        self.window.title("Snake Game")
+        self.window.resizable(False, False)
 
-x = int((screen_width / 2) - (window_width / 2))
-y = int((screen_height / 2) - (window_height / 2))
+        self.score = 0
+        self.highscore = 0
+        self.round_number = 1
+        self.direction = 'down'
+        self.restart_button = None
+        self.game_loop_id = None
 
-window.geometry("{}x{}+{}+{}".format(window_width, window_height, x, y))
+        self.label = Label(self.window, text="Score: 0", font=('consolas', 40), fg="#00FF00")
+        self.label.pack()
 
-window.bind('<a>', lambda event: change_direction('left'))
-window.bind('<d>', lambda event: change_direction('right'))
-window.bind('<w>', lambda event: change_direction('up'))
-window.bind('<s>', lambda event: change_direction('down'))
+        global canvas
+        canvas = Canvas(self.window, bg=BACKGROUND_COLOR, height=GAME_HEIGHT, width=GAME_WIDTH)
+        canvas.pack()
 
-snake = Snake(SNAKE_COLOR)
-food = Food(snake.coordinates)
-print("If you have any feedback regarding this product you may contact the developer (Bayazid) anytime you want. Contact:- notbayazid@gmail.com")
-next_turn(snake, food)
+        self.window.update()
+        self.center_window()
 
-window.mainloop()
+        pygame.mixer.Sound.play(background_music, loops=-1)
+
+        print("Contact the developer (Bayazid) at notbayazid@gmail.com for feedback.")
+        
+        self.reset_game()
+
+    def reset_game(self):
+        if self.restart_button:
+            self.restart_button.destroy()
+        if self.game_loop_id:
+            self.window.after_cancel(self.game_loop_id)
+
+        self.score = 0
+        self.direction = 'down'
+        self.label.config(text="Score: 0", fg="#00FF00")
+        canvas.delete("all")
+
+        SNAKE_COLOR = random.choice(snake_colors)
+        self.snake = Snake(SNAKE_COLOR)
+        self.food = Food(self.snake.coordinates)
+
+        self.window.bind('<a>', lambda event: self.change_direction('left'))
+        self.window.bind('<d>', lambda event: self.change_direction('right'))
+        self.window.bind('<w>', lambda event: self.change_direction('up'))
+        self.window.bind('<s>', lambda event: self.change_direction('down'))
+
+        if self.round_number > 1:
+            print("--------")
+
+        print(f"Round {self.round_number}")
+        self.round_number += 1
+        self.next_turn()
+
+    def game_over(self):
+        if self.game_loop_id:
+            self.window.after_cancel(self.game_loop_id)
+
+        canvas.delete("all")
+        canvas.create_text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 50, font=('consolas', 70),
+                           text="GAME OVER...", fill="red", tag="game_over")
+        canvas.create_text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - -0.5, font=('consolas', 20),
+                           text="Game Developed By Bayazid", fill="grey", tag="developer")
+
+        pygame.mixer.Sound.play(game_over_sound)
+
+        if self.score > self.highscore:
+            self.highscore = self.score
+
+        print(f"Game Over! Your score: {self.score}")
+        print(f"High Score: {self.highscore}")
+
+        self.restart_button = Button(self.window, text="RESTART GAME", command=self.reset_game,
+                                     font=("Arial", 18), fg="#00FF00", bg="#e2fE34")
+        self.restart_button.place(relx=0.5, rely=0.65, anchor=CENTER)
+
+    def center_window(self):
+        window_width = self.window.winfo_width()
+        window_height = self.window.winfo_height()
+        screen_width = self.window.winfo_screenwidth()
+        screen_height = self.window.winfo_screenheight()
+        x = int((screen_width / 2) - (window_width / 2))
+        y = int((screen_height / 2) - (window_height / 2))
+        self.window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+
+    def next_turn(self):
+        x, y = self.snake.coordinates[0]
+        if self.direction == "up":
+            y -= SPACE_SIZE
+        elif self.direction == "down":
+            y += SPACE_SIZE
+        elif self.direction == "left":
+            x -= SPACE_SIZE
+        elif self.direction == "right":
+            x += SPACE_SIZE
+
+        self.snake.move(x, y)
+
+        if [x, y] == self.food.coordinates:
+            self.score += 1
+            self.label.config(text=f"Score: {self.score}", fg="#00FF00")
+            canvas.delete("food")
+            self.food = Food(self.snake.coordinates)
+            pygame.mixer.Sound.play(eat_sound)
+        else:
+            self.snake.shrink()
+
+        if self.check_collisions():
+            self.game_over()
+        else:
+            self.game_loop_id = self.window.after(SPEED, self.next_turn)
+
+    def change_direction(self, new_direction):
+        if new_direction == 'left' and self.direction != 'right':
+            self.direction = new_direction
+        elif new_direction == 'right' and self.direction != 'left':
+            self.direction = new_direction
+        elif new_direction == 'up' and self.direction != 'down':
+            self.direction = new_direction
+        elif new_direction == 'down' and self.direction != 'up':
+            self.direction = new_direction
+
+    def check_collisions(self):
+        x, y = self.snake.coordinates[0]
+        if x < 0 or x >= GAME_WIDTH or y < 0 or y >= GAME_HEIGHT:
+            return True
+        if any(x == part[0] and y == part[1] for part in self.snake.coordinates[1:]):
+            return True
+        return False
+
+if __name__ == "__main__":
+    game = Game()
+    game.window.mainloop()
